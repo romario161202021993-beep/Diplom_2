@@ -1,12 +1,12 @@
 # Maven
-target/
+target/*
+!target/allure-results/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
 # Allure
 .allure/
-allure-results/
 .allure-*
 
 ### IntelliJ IDEA ###
