@@ -10,6 +10,7 @@ import ru.yandex.praktikum.client.UserClient;
 import ru.yandex.praktikum.model.User;
 import ru.yandex.praktikum.model.UserGenerator;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.*;
 
 public class UserLoginTest {
@@ -23,7 +24,6 @@ public class UserLoginTest {
         userClient = new UserClient();
         user = UserGenerator.getRandomUser();
 
-        // Создаём пользователя для тестов авторизации
         Response registerResponse = userClient.register(user);
         accessToken = registerResponse.jsonPath().getString("accessToken");
     }
@@ -34,9 +34,8 @@ public class UserLoginTest {
     public void loginExistingUserSuccessTest() {
         Response response = userClient.login(user);
 
-        // ОР: статус 200, success = true, возвращается токен и данные пользователя
         response.then()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .body("success", equalTo(true))
                 .body("accessToken", notNullValue())
                 .body("refreshToken", notNullValue())
@@ -52,9 +51,8 @@ public class UserLoginTest {
 
         Response response = userClient.login(wrongUser);
 
-        // ОР: статус 401, success = false, message об ошибке
         response.then()
-                .statusCode(401)
+                .statusCode(SC_UNAUTHORIZED)
                 .body("success", equalTo(false))
                 .body("message", equalTo("email or password are incorrect"));
     }
@@ -67,16 +65,14 @@ public class UserLoginTest {
 
         Response response = userClient.login(wrongUser);
 
-        // ОР: статус 401, success = false
         response.then()
-                .statusCode(401)
+                .statusCode(SC_UNAUTHORIZED)
                 .body("success", equalTo(false))
                 .body("message", equalTo("email or password are incorrect"));
     }
 
     @After
     public void tearDown() {
-        // Удаляем тестового пользователя
         if (accessToken != null) {
             userClient.delete(accessToken);
         }

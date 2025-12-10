@@ -1,25 +1,28 @@
 package ru.yandex.praktikum.model;
 
+import com.github.javafaker.Faker;
+
 public class UserGenerator {
 
+    private static final Faker faker = new Faker();
+
     public static User getRandomUser() {
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String email = "test_user_" + timestamp + "@yandex.ru";
-        String password = "password123";
-        String name = "TestUser" + timestamp;
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password(8, 16);
+        String name = faker.name().firstName();
 
         return new User(email, password, name);
     }
 
     public static User getUserWithoutEmail() {
-        return new User(null, "password123", "TestUser");
+        return new User(null, faker.internet().password(8, 16), faker.name().firstName());
     }
 
     public static User getUserWithoutPassword() {
-        return new User("test@yandex.ru", null, "TestUser");
+        return new User(faker.internet().emailAddress(), null, faker.name().firstName());
     }
 
     public static User getUserWithoutName() {
-        return new User("test@yandex.ru", "password123", null);
+        return new User(faker.internet().emailAddress(), faker.internet().password(8, 16), null);
     }
 }

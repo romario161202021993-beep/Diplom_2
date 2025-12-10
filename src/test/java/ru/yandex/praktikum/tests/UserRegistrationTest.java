@@ -10,8 +10,8 @@ import ru.yandex.praktikum.client.UserClient;
 import ru.yandex.praktikum.model.User;
 import ru.yandex.praktikum.model.UserGenerator;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 
 public class UserRegistrationTest {
 
@@ -32,9 +32,8 @@ public class UserRegistrationTest {
 
         Response response = userClient.register(user);
 
-        // ОР: статус 200, success = true, возвращается accessToken и данные пользователя
         response.then()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .body("success", equalTo(true))
                 .body("accessToken", notNullValue())
                 .body("refreshToken", notNullValue())
@@ -50,16 +49,13 @@ public class UserRegistrationTest {
     public void createDuplicateUserFailTest() {
         user = UserGenerator.getRandomUser();
 
-        // Регистрируем пользователя первый раз
         Response firstResponse = userClient.register(user);
         accessToken = firstResponse.jsonPath().getString("accessToken");
 
-        // Пытаемся зарегистрировать того же пользователя повторно
         Response secondResponse = userClient.register(user);
 
-        // ОР: статус 403, success = false, message = "User already exists"
         secondResponse.then()
-                .statusCode(403)
+                .statusCode(SC_FORBIDDEN)
                 .body("success", equalTo(false))
                 .body("message", equalTo("User already exists"));
     }
@@ -72,9 +68,8 @@ public class UserRegistrationTest {
 
         Response response = userClient.register(user);
 
-        // ОР: статус 403, success = false, сообщение об обязательных полях
         response.then()
-                .statusCode(403)
+                .statusCode(SC_FORBIDDEN)
                 .body("success", equalTo(false))
                 .body("message", equalTo("Email, password and name are required fields"));
     }
@@ -87,9 +82,8 @@ public class UserRegistrationTest {
 
         Response response = userClient.register(user);
 
-        // ОР: статус 403, success = false
         response.then()
-                .statusCode(403)
+                .statusCode(SC_FORBIDDEN)
                 .body("success", equalTo(false))
                 .body("message", equalTo("Email, password and name are required fields"));
     }
@@ -102,16 +96,14 @@ public class UserRegistrationTest {
 
         Response response = userClient.register(user);
 
-        // ОР: статус 403, success = false
         response.then()
-                .statusCode(403)
+                .statusCode(SC_FORBIDDEN)
                 .body("success", equalTo(false))
                 .body("message", equalTo("Email, password and name are required fields"));
     }
 
     @After
     public void tearDown() {
-        // Удаляем созданного пользователя, если он был успешно создан
         if (accessToken != null) {
             userClient.delete(accessToken);
         }
